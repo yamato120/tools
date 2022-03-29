@@ -8,18 +8,34 @@
     <title>チーム分け</title>
 </head>
 
-
 <body>
     メンバー入力<br>
-    <textarea rows="16" id="text" style="float: left;" placeholder="1人ずつ改行して入力"></textarea>
+    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力"></textarea>
     →
-    <textarea rows="8" id="team1" style="padding: 0px;" placeholder="team1"></textarea><br>
+    <textarea rows="8" id="team1" placeholder="team1"></textarea><br>
     　
-    <textarea rows="8" id="team2" style="padding: 0px;" placeholder="team2"></textarea><br>
+    <textarea rows="8" id="team2" placeholder="team2"></textarea><br>
     <input type="button" id="done" value="実行" onclick="grouping()">
+    <input type="button" id="delete" value="クリア" onclick="deleteForm()">
 </body>
 
 </html>
+
+<style>
+    #text {
+        float: left;
+    }
+
+    #team1 {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #team2 {
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
 
 <script>
     function grouping() {
@@ -49,6 +65,11 @@
         }
     }
 
+    function deleteForm() {
+        document.getElementById("text").value = "";
+        document.getElementById("team1").value = "";
+        document.getElementById("team2").value = "";
+    }
 
     function getRandom(min, max) {
         var random = Math.floor(Math.random() * (max + 1 - min)) + min;
