@@ -10,30 +10,41 @@
 
 <body>
     メンバー入力<br>
-    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力"></textarea>
-    →
-    <textarea rows="8" id="team1" placeholder="team1"></textarea><br>
-    　
-    <textarea rows="8" id="team2" placeholder="team2"></textarea><br>
+    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力(16人まで)"></textarea><br>
     <input type="button" id="done" value="実行" onclick="grouping()">
     <input type="button" id="delete" value="クリア" onclick="deleteForm()">
+    <table class="design01">
+        <tr>
+            <th>team1</th>
+            <th>team2</th>
+        </tr>
+        <tr>
+            <td id="team1">　</td>
+            <td id="team2">　</td>
+        </tr>
+    </table>
 </body>
 
 </html>
 
 <style>
-    #text {
-        float: left;
+    .design01 {
+        margin-top: 10px;
+        width: auto;
+        text-align: center;
+        border-collapse: collapse;
+        border-spacing: 0;
     }
 
-    #team1 {
-        margin: 0px;
-        padding: 0px;
+    .design01 th {
+        padding: 10px;
+        background: #e9faf9;
+        border: solid 1px #778ca3;
     }
 
-    #team2 {
-        margin: 0px;
-        padding: 0px;
+    .design01 td {
+        padding: 10px;
+        border: solid 1px #778ca3;
     }
 </style>
 
@@ -42,8 +53,8 @@
         var text = document.getElementById("text").value.trimEnd();
         var team1 = document.getElementById("team1");
         var team2 = document.getElementById("team2");
-        team1.value = "";
-        team2.value = "";
+        team1.innerText = "";
+        team2.innerText = "";
         var items = text.split("\n");
         var len = items.length;
         var temp;
@@ -58,17 +69,17 @@
         }
         for (i = 0; i < len; i++) {
             if (i < len / 2) {
-                team1.value += items[i] + "\n";
+                team1.innerText += items[i] + "\n";
             } else {
-                team2.value += items[i] + "\n";
+                team2.innerText += items[i] + "\n";
             }
         }
     }
 
     function deleteForm() {
         document.getElementById("text").value = "";
-        document.getElementById("team1").value = "";
-        document.getElementById("team2").value = "";
+        document.getElementById("team1").innerText = "";
+        document.getElementById("team2").innerText = "";
     }
 
     function getRandom(min, max) {
