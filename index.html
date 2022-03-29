@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>チーム分け</title>
+</head>
+
+
+<body>
+    メンバー入力<br>
+    <textarea rows="16" id="text" style="float: left;"></textarea>
+    →
+    <textarea rows="8" id="team1"></textarea><br>
+    　
+    <textarea rows="8" id="team2"></textarea><br>
+    <input type="button" id="done" value="実行" onclick="grouping()">
+</body>
+
+</html>
+
+<script>
+    function grouping() {
+        var text = document.getElementById("text").value.trimEnd();
+        var team1 = document.getElementById("team1");
+        var team2 = document.getElementById("team2");
+        team1.value = "";
+        team2.value = "";
+        var items = text.split("\n");
+        var len = items.length;
+        var temp;
+        if (len % 2 == 1) {
+            alert("偶数人数入力してください。");
+        }
+        for (var i = 0; i < len; i++) {
+            var rand = getRandom(0, len - 1);
+            temp = items[i];
+            items[i] = items[rand];
+            items[rand] = temp;
+        }
+        for (i = 0; i < len; i++) {
+            if (i < len / 2) {
+                team1.value += items[i] + "\n";
+            } else {
+                team2.value += items[i] + "\n";
+            }
+        }
+    }
+
+
+    function getRandom(min, max) {
+        var random = Math.floor(Math.random() * (max + 1 - min)) + min;
+        return random;
+    }
+</script>
