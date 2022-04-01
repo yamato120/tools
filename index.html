@@ -10,7 +10,8 @@
 
 <body>
     メンバー入力<br>
-    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力(最大16人まで)"></textarea><br>
+    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="check()"></textarea>
+    現在:<span id="num">0</span>名<br>
     チーム数
     <select id="number_of_team" onchange="set_colum()">
         <option value="2" selected>2</option>
@@ -37,10 +38,17 @@
 
 </html>
 <script>
+    function check() {
+        let text = document.getElementById("text").value.trimEnd();
+        let items = text.split(/\n/);
+        let len = items.length;
+        document.getElementById("num").innerText = len;
+    }
+
     function grouping() {
         var num = document.getElementById("number_of_team").value;
         var text = document.getElementById("text").value.trimEnd();
-        var items = text.split("\n");
+        var items = text.split(/\n/);
         var len = items.length;
         var temp;
         //実行可能か判定
@@ -72,7 +80,7 @@
         var table = document.getElementById("table");
         var cols = table.rows[0].cells.length; // 列数
         while (cols != num) {
-            if (cols < num) {   //add 
+            if (cols < num) {   //add
                 var colCnt = table.rows[0].cells.length; // 行内セルの数
                 var th = document.createElement('th'); // <TH>要素を生成
                 table.rows[0].appendChild(th); // 一行目に<TH>を付加
@@ -99,6 +107,7 @@
             var team = document.getElementById("team" + ((i % num) + 1));
             team.innerText = "";
         }
+        document.getElementById("num").innerText = 0;
     }
 
     function getRandom(min, max) {
@@ -108,7 +117,7 @@
 </script>
 
 <style>
-    #text{
+    #text {
         resize: none;
         overflow: hidden;
     }
