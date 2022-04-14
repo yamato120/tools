@@ -43,7 +43,10 @@
 </html>
 <script>
     function cookie_set(){
-        document.getElementById("text").value = Cookies.get('text');
+        var cookie = Cookies.get('text');
+        if(cookie != undefined){
+            document.getElementById("text").value = cookie;
+        }
     }
 
     function check() {
