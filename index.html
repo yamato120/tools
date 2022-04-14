@@ -84,7 +84,8 @@
             var team = document.getElementById("team" + ((i % num) + 1));
             team.innerText += items[i] + "\n";
         }
-        Cookies.set('text', text);
+        Cookies.set('text', text, {expires: 365});
+        Cookies.set('locale', 'ja-JP'); //ユーザーの使用言語を日本語に指定
     }
 
     function set_colum() {
