@@ -5,11 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
     <title>チーム分け</title>
 </head>
 
 <body>
-    メンバー入力<br>
+    メンバー入力　
+    <input type="button" id="cookie" value="前回のデータを読み込む" onclick="cookie_set()">
+    <br>
     <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="check()"></textarea>
     現在:<span id="num">0</span>名<br>
     チーム数
@@ -38,6 +42,10 @@
 
 </html>
 <script>
+    function cookie_set(){
+        document.getElementById("text").value = Cookies.get('text');
+    }
+
     function check() {
         let text = document.getElementById("text").value.trimEnd();
         let items = text.split(/\n/);
@@ -73,6 +81,7 @@
             var team = document.getElementById("team" + ((i % num) + 1));
             team.innerText += items[i] + "\n";
         }
+        Cookies.set('text', text);
     }
 
     function set_colum() {
