@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>SQL生成</title>
+</head>
+
+<body>
+    交換所
+    <select id="shoptype">
+        <option value="5" selected>ギルポ</option>
+        <option value="10">狩煉道</option>
+    </select>
+    追加場所
+    <select id="shopid">
+        <option value="0">基本アイテム</option>
+        <option value="1">採取素材</option>
+        <option value="2">素材(HR1～4)</option>
+        <option value="3">汎用素材(HR5～7)</option>
+        <option value="6">G級素材(GR1～)</option>
+        <option value="4">装飾品</option>
+        <option value="5" selected>その他のアイテム</option>
+    </select>
+    <br>
+    item_hashの最後の値
+    <input type="text" id="itemhash" style="width:60px;" placeholder="半角数字">
+    値段
+    <input type="text" id="points" style="width:60px;" value="1" placeholder="半角数字">
+    数量
+    <input type="text" id="tradequantity" style="width:60px;" value="999" placeholder="半角数字"><br>
+    item_id入力<br>
+    <textarea rows="10" id="itemid" placeholder="半角数字改行して入力" style="width:60px;"></textarea>
+    <input type="button" id="done" value="SQL生成" onclick="done()">
+    <input type="button" id="delete" value="クリア" onclick="deleteForm()">
+    <br>
+    <div id="disp">
+    </div>
+</body>
+
+</html>
+
+<script>
+    function done() {
+        var shoptype = document.getElementById("shoptype").value;
+        var shopid = document.getElementById("shopid").value;
+        var itemhash = document.getElementById("itemhash").value;
+        var points = document.getElementById("points").value;
+        var tradequantity = document.getElementById("tradequantity").value;
+        var INSERT = 'INSERT INTO "public"."normal_shop_items" <br> ("shoptype", "shopid", "itemhash", "itemid", "points", "tradequantity", "rankreqlow", "rankreqhigh", "rankreqg", "storelevelreq", "maximumquantity", "boughtquantity", "roadfloorsrequired", "weeklyfataliskills")<br> VALUES <br>';
+        var text = document.getElementById("itemid").value.trimEnd();
+        var itemid = text.split(/\n/);
+        var len = itemid.length;
+        var disp = document.getElementById("disp");
+
+        if (shoptype == '' || shopid == '' || itemhash == '' || points == '' || tradequantity == '' || text == '') {
+            alert("未入力の項目があります");
+            exit();
+        }
+        disp.innerHTML = INSERT;
+        for (var i = 0; i < len; i++) {
+            disp.innerHTML += `(${shoptype}, ${shopid}, ${parseInt(itemhash) + parseInt(i) + 1}, ${itemid[i]}, ${points}, ${tradequantity}, 0, 0, 0, 0, 0, 0, 0, 0)`;
+            if (i + 1 != len) {
+                disp.innerHTML += ',<br>';
+            }
+        }
+        disp.innerHTML += ';';
+    }
+
+    function deleteForm() {
+        location.reload();
+    }
+</script>
