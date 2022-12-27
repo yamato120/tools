@@ -17,12 +17,14 @@
     <input type="button" id="done" value="実行" onclick="round_robin()">
     <input type="button" id="delete" value="クリア" onclick="deleteForm()">
     <br>
-    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="">
+    <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="check()">
 player1
 player2
 player3
 player4
-</textarea>
+player5
+player6
+</textarea>現在:<span id="num">0</span>名<br>
     <h3>(ii)表</h3>
     <table class="design01" id="table">
     </table><br>
@@ -34,6 +36,15 @@ player4
 
 </html>
 <script>
+    check();
+
+    function check() {
+        let text = document.getElementById("text").value.trimEnd();
+        let items = text.split(/\n/);
+        let len = items.length;
+        document.getElementById("num").innerText = len;
+    }
+
     function cookie_set() {
         let cookie = Cookies.get('text');
         if (cookie != undefined) {
