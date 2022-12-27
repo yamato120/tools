@@ -35,7 +35,7 @@ player4
 </html>
 <script>
     function cookie_set() {
-        var cookie = Cookies.get('text');
+        let cookie = Cookies.get('text');
         if (cookie != undefined) {
             document.getElementById("text").value = cookie;
         }
@@ -46,22 +46,22 @@ player4
         // 表出力
         set_table();
 
-        var text = document.getElementById("text").value.trimStart();
-        var text = document.getElementById("text").value.trimEnd();
-        var member = text.split(/\n/);
-        var len = member.length;    // 人数
-        var i, n;
+        let text;
+        text = document.getElementById("text").value.trimStart();
+        text = document.getElementById("text").value.trimEnd();
+        let member = text.split(/\n/);
+        let len = member.length;    // 人数
 
         if (member[0] == "") {
             alert("入力エラー");
             exit(1);
         }
 
-        var list = null;
+        let list = null;
 
         // プレイヤー配列 1,2,4,8,16,...,len
         list = new Array(len);
-        for (i = 0; i < len; i++) {
+        for (let i = 0; i < len; i++) {
             // 属性付与 list.num:番号 list.name:名前
             list[i] = new Object();
             list[i].num = 2 ** i;
@@ -70,27 +70,28 @@ player4
             //console.log(list[i].name);
         }
 
-        var order = [];   // 対戦順 list.num の和で組み合わせを表現
-        for (i = 0; i < len; i++) {
-            for (j = 0; j < i; j++) {
+        let order = [];   // 対戦順 list.num の和で組み合わせを表現
+        for (let i = 0; i < len; i++) {
+            for (let j = 0; j < i; j++) {
                 order.push(list[i].num + list[j].num);
 
             }
         }
 
-        var cnt = 0
-        while (cnt < 10) {
-            // 2opt法で改善
-            if (two_opt(order) == 1) break;
-            // 一点交換法で改善
-            if (exchange(order) == 1) break;
+        shuffle(order);
+
+        let cnt = 0
+        while (cnt < 5) {
+            best_two_opt(order);
+            best_exchange(order);
             cnt++;
         }
-        //rnd_two_opt(order);
 
+        console.log("連戦数" + evaluate(order));
 
         // 対戦順出力
         print_order(order, list);
+
 
 
         Cookies.set('locale', 'ja-JP'); //ユーザーの使用言語を日本語に指定
@@ -98,26 +99,26 @@ player4
     }
 
     function set_table() {
-        var table = document.getElementById("table");
-        var text = document.getElementById("text").value.trimEnd();
-        var member = text.split(/\n/);
-        var idNum;
+        let table = document.getElementById("table");
+        let text = document.getElementById("text").value.trimEnd();
+        let member = text.split(/\n/);
+        let idNum;
 
         // 一度tableを初期化（全削除）する
         while (table.rows.length > 0) table.deleteRow(0);
 
-        var i, j;
-        var n;  //人数
-        var sum;
+        let i, j;
+        let n;  //人数
+        let sum;
         n = member.length;
         for (i = 0; i < n + 1; i++) {
             // 行生成
-            var tr = document.createElement('tr');
+            let tr = document.createElement('tr');
 
             sum = 0;
             for (j = 0; j < n + 2; j++) {
                 if (i == 0) { // 1行目の処理
-                    var th = document.createElement('th');
+                    let th = document.createElement('th');
                     if (j == 0) {
                         th.innerHTML = "";
                     } else if (j < n + 1) {
@@ -128,11 +129,11 @@ player4
                     tr.appendChild(th);
                 } else {    // 2行目以降の処理
                     if (j == 0) {   // 1列目（名前）
-                        var th = document.createElement('th');
+                        let th = document.createElement('th');
                         th.innerHTML = member[i - 1];
                         tr.appendChild(th);
                     } else if (j < n + 1) {    // 2列目以降
-                        var td = document.createElement('td');
+                        let td = document.createElement('td');
                         td.id = (i - 1) + "_" + (j - 1);   //id付与 id="y_x"
                         if (i == j) {
                             td.classList.add("border");
@@ -146,7 +147,7 @@ player4
                         }
                         tr.appendChild(td);
                     } else {
-                        var td = document.createElement('td');
+                        let td = document.createElement('td');
                         td.innerHTML = sum;
                         tr.appendChild(td);
                     }
@@ -157,7 +158,7 @@ player4
     }
 
     function print_order(order, list) {
-        var tbl = document.getElementById("order");
+        let tbl = document.getElementById("order");
         let flg;
         let combo = new Array(2);
 
@@ -169,9 +170,9 @@ player4
         for (i = 0; i < order.length; i++) {
             flg = 0;
             // 行生成
-            var tr = document.createElement('tr');
+            let tr = document.createElement('tr');
             // 1列目生成
-            var th = document.createElement('th');
+            let th = document.createElement('th');
             th.innerHTML = "第" + (i + 1) + "試合";
             tr.appendChild(th);
             for (j = 0; j < len; j++) {
@@ -187,7 +188,7 @@ player4
             // 生成
 
             // 1人目 名前
-            var td = document.createElement('td');
+            let td = document.createElement('td');
             td.innerHTML = list[combo[0]].name;
             tr.appendChild(td);
             // 1人目 得点
@@ -223,167 +224,109 @@ player4
         }
     }
 
-    function two_opt(order) {
-        var i, j, n, i2, j2;
-        var temp, before, after;
-        var count = 0, flg = 0;
-        while (flg == 0) {
-            count++;
-            if (count > 100) flg = 1;
-            before = evaluate(order);
-            for (i = 0; i < order.length; i++) {
-                for (j = 0; j < order.length; j++) {
-                    if (i != j) {
-                        if (i < j) {
-                            i2 = i;
-                            j2 = j;
-                        } else {
-                            i2 = j;
-                            j2 = i;
-                        }
-                        //選ばれた点と繋ぎなおす
-                        for (; i2 < j2; i2++, j2--) {
-                            temp = order[i2];
-                            order[i2] = order[j2];
-                            order[j2] = temp;
-                        }
-                        after = evaluate(order);
-                        if (before < after) {
-                            //戻す
-                            if (i < j) {
-                                i2 = i;
-                                j2 = j;
-                            } else {
-                                i2 = j;
-                                j2 = i;
-                            }
-                            for (; i2 < j2; i2++, j2--) {
-                                temp = order[i2];
-                                order[i2] = order[j2];
-                                order[j2] = temp;
-                            }
-                        } else {
-                            before = after;
-                            if (after == 1) flg = 1;
-                        }
-                    }
-                }
-            }
+    function shuffle(order) {
+        let tmp, j, max;
+        max = order.length
+        for (let i = 0; i < max; i++) {
+            j = getRandom(0, max - 1);
+            tmp = order[i];
+            order[i] = order[j];
+            order[j] = tmp;
         }
-        return evaluate(order);
     }
 
-    function exchange(order) {
-        var i, j, n, i2, j2;
-        var temp, before, after;
-        var count = 0, flg = 0;
-        while (flg == 0) {
-            count++;
-            if (count > 100) flg = 1;
-            before = evaluate(order);
-            for (i = 0; i < order.length; i++) {
-                for (j = 0; j < order.length; j++) {
-                    if (i != j) {
-                        //選ばれた点と交換
-                        temp = order[i];
-                        order[i] = order[j];
-                        order[j] = temp;
-                        after = evaluate(order);
-                        if (before < after) {
-                            //戻す
-                            temp = order[i];
-                            order[i] = order[j];
-                            order[j] = temp;
-                        } else {
-                            before = after;
-                            if (after == 1) flg = 1;
-                        }
-                    }
-                }
-            }
-        }
-        return evaluate(order);
-    }
-
-    function rnd_two_opt(order) {
-        var i, j, n, i2, j2;
-        var temp, before, after;
-        var count = 0, flg = 0;
+    function best_two_opt(order) {
+        let size = order.length;
+        let before, after, zantei = 0;
+        let i3, j3;
+        let cnt = 0;
         while (1) {
-            for (i = 0; i < order.length - 1; i++) {
-                if ((order[i] & order[i + 1]) > 0) {
-                    do {
-                        var j = Math.floor(Math.random() * (order.length + 1));
-                    } while (j == i || j == i + 1)
-                }
-                before = evaluate(order);
-                if (i != j) {
+            before = evaluate(order);
+            for (let i = 0; i < size; i++) {
+                for (let j = i + 2; j < size; j++) {
+                    let i2, j2;
                     i2 = i;
                     j2 = j;
-                    //選ばれた点と繋ぎなおす
                     for (; i2 < j2; i2++, j2--) {
-                        temp = order[i2];
+                        let tmp = order[i2];
                         order[i2] = order[j2];
-                        order[j2] = temp;
+                        order[j2] = tmp;
                     }
                     after = evaluate(order);
-                    if (before < after) {
-                        i2 = i;
-                        j2 = j;
-                        //戻す
-                        for (; i2 < j2; i2++, j2--) {
-                            temp = order[i2];
-                            order[i2] = order[j2];
-                            order[j2] = temp;
-                        }
-                    } else {
+                    for (; i2 < j2; i2++, j2--) {
+                        tmp = order[i2];
+                        order[i2] = order[j2];
+                        order[j2] = tmp;
+                    }
+                    //console.log(before - after);
+                    if (zantei < before - after) {
+                        zantei = before - after;
+                        i3 = i;
+                        j3 = j;
                     }
                 }
             }
-            if (after == 1) break;
-            count++;
-            if (count > 10) break;
+            if (zantei > 0) {
+                for (; i3 < j3; i3++, j3--) {
+                    let tmp = order[i3];
+                    order[i3] = order[j3];
+                    order[j3] = tmp;
+                }
+                zantei = 0;
+                //console.log("opt実行");
+                cnt++;
+            } else {
+                break;
+            }
         }
-        //console.log(count);
-        return count;
+        return cnt;
     }
 
-    function rnd_exchange(order) {
-        var i, j, n, i2, j2;
-        var temp, before, after;
-        var count = 0, flg = 0;
-
-        
-        before = evaluate(order);
-        for (i = 0; i < order.length; i++) {
-            for (j = 0; j < order.length; j++) {
-                if (i != j) {
-                    //選ばれた点と交換
-                    temp = order[i];
-                    order[i] = order[j];
-                    order[j] = temp;
+    function best_exchange(order) {
+        let size = order.length;
+        let before, after, zantei = 0;
+        let i3, j3;
+        let cnt = 0;
+        while (1) {
+            before = evaluate(order);
+            for (let i = 0; i < size - 1; i++) {
+                for (let j = i + 2; j < size; j++) {
+                    let i2, j2;
+                    i2 = i;
+                    j2 = j;
+                    let tmp = order[i2];
+                    order[i2] = order[j2];
+                    order[j2] = tmp;
                     after = evaluate(order);
-                    if (before < after) {
-                        i = i;
-                        j = j;
-                        //戻す
-                        temp = order[i];
-                        order[i] = order[j];
-                        order[j] = temp;
-                    } else {
-                        if (after == 1) flg = 1;
+                    order[j2] = order[i2];
+                    order[i2] = tmp;
+                    //console.log(before - after);
+                    if (zantei < before - after) {
+                        zantei = before - after;
+                        i3 = i;
+                        j3 = j;
                     }
                 }
             }
+            if (zantei > 0) {
+                let tmp = order[i3];
+                order[i3] = order[j3];
+                order[j3] = tmp;
+                zantei = 0;
+                //console.log("change実行");
+                cnt++;
+            } else {
+                break;
+            }
         }
-        return count;
+        return cnt;
     }
 
     function evaluate(order) {
-        var flg = 1;
-        var max = 0;
-        var total = 1;
-        for (var i = 0; i < order.length - 1; i++) {
+        let flg = 1;
+        let max = 0;
+        let total = 0;
+        for (let i = 0; i < order.length - 1; i++) {
             if ((order[i] & order[i + 1]) > 0) {
                 flg++;
                 total++;
@@ -392,8 +335,8 @@ player4
             }
             if (flg > max) max = flg;
         }
-        console.log('最大連戦数：' + max);
-        console.log('総合連戦数：' + total);
+        //console.log('最大連戦数：' + max);
+        //console.log('総合連戦数：' + total);
         return total;
     }
 
@@ -404,7 +347,7 @@ player4
     }
 
     function getRandom(min, max) {
-        var random = Math.floor(Math.random() * (max + 1 - min)) + min;
+        let random = Math.floor(Math.random() * (max + 1 - min)) + min;
         return random;
     }
 </script>
