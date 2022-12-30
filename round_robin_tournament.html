@@ -15,6 +15,7 @@
     <h3>(i)選手登録</h3>
     <input type="button" id="cookie" value="前回のデータを読み込む" onclick="cookie_set()">
     <input type="button" id="done" value="実行" onclick="round_robin()">
+    <input type="button" id="delete" value="リセット" onclick="deleteForm()">
     <br>
     <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="check()">
 player1
@@ -394,6 +395,7 @@ player6
         while (document.getElementById("table").rows.length > 0) document.getElementById("table").deleteRow(0);
         while (document.getElementById("order").rows.length > 0) document.getElementById("order").deleteRow(0);
         document.getElementById("num").innerText = 0;
+        document.getElementById("continuous").innerHTML="";
     }
 
     function getRandom(min, max) {
