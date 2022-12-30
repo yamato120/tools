@@ -15,7 +15,6 @@
     <h3>(i)選手登録</h3>
     <input type="button" id="cookie" value="前回のデータを読み込む" onclick="cookie_set()">
     <input type="button" id="done" value="実行" onclick="round_robin()">
-    <input type="button" id="delete" value="クリア" onclick="deleteForm()">
     <br>
     <textarea rows="16" id="text" placeholder="1人ずつ改行して入力" oninput="check()">
 player1
@@ -26,11 +25,12 @@ player5
 player6
 </textarea>現在:<span id="num">0</span>名<br>
     <h3>(ii)表</h3>
+    <input type="button" name="clr" value="クリア" onclick="reset()">
     <table class="design01" id="table">
     </table><br>
-    <input type="button" id="load" value="更新" onclick="set_table()">
-    <h3>(iii)対戦順</h3>
-    <table id="order">
+    <h3 style="float: left;">(iii)対戦順</h3>
+    <span id="continuous" style="font-size: 90%; float: left; margin: 1.6em 0px 0px 1em;"></span>
+    <table id="order" style="clear: left;">
     </table>
 </body>
 
@@ -91,17 +91,19 @@ player6
 
         shuffle(order);
 
-        let cnt = 0
-        while (cnt < 5) {
-            best_two_opt(order);
-            best_exchange(order);
-            cnt++;
+        for(let cnt=0;cnt<10;cnt++) {
+            cnt1 = best_two_opt(order);
+            cnt2 = best_exchange(order);
         }
 
-        console.log("連戦数" + evaluate(order));
+        conti = evaluate(order);
+
+        console.log("連戦数" + conti);
 
         // 対戦順出力
         print_order(order, list);
+
+        document.getElementById("continuous").innerHTML=`\t総試合数:${(len*(len-1)/2)}  連戦数:${conti}`;
 
         Cookies.set('locale', 'ja-JP'); //ユーザーの使用言語を日本語に指定
         Cookies.set('text', text, { expires: 30 });
@@ -111,19 +113,16 @@ player6
         let table = document.getElementById("table");
         let text = document.getElementById("text").value.trimEnd();
         let member = text.split(/\n/);
-        let idNum;
 
         // 一度tableを初期化（全削除）する
         while (table.rows.length > 0) table.deleteRow(0);
 
         let i, j;
         let n;  //人数
-        let sum;
         n = member.length;
         for (i = 0; i < n + 1; i++) {
             // 行生成
             let tr = document.createElement('tr');
-
             sum = 0;
             for (j = 0; j < n + 2; j++) {
                 if (i == 0) { // 1行目の処理
@@ -146,18 +145,12 @@ player6
                         td.id = (i - 1) + "_" + (j - 1);   //id付与 id="y_x"
                         if (i == j) {
                             td.classList.add("border");
-                        } else {
-                            if (idNum = document.getElementById('in' + (i - 1) + '_' + (j - 1))) {
-                                td.innerHTML = idNum.value;
-                                sum += Number(idNum.value);
-                            } else {
-                                td.innerHTML = "";
-                            }
                         }
                         tr.appendChild(td);
-                    } else {
+                    } else {    // 合計表示
                         let td = document.createElement('td');
-                        td.innerHTML = sum;
+                        td.id = 'sum' + (i - 1);
+                        td.innerHTML = 0;
                         tr.appendChild(td);
                     }
                 }
@@ -195,7 +188,6 @@ player6
                 order[i] = order[i] >> 1;
             }
             // 生成
-
             // 1人目 名前
             let td = document.createElement('td');
             td.innerHTML = list[combo[0]].name;
@@ -207,6 +199,7 @@ player6
             input1.setAttribute("maxlength", "5");
             input1.setAttribute("size", "1");
             input1.id = 'in' + combo[0] + '_' + combo[1];
+            input1.oninput = update;
             td.appendChild(input1);
             tr.appendChild(td);
             // vs
@@ -220,6 +213,7 @@ player6
             input2.setAttribute("maxlength", "5");
             input2.setAttribute("size", "1");
             input2.id = 'in' + combo[1] + '_' + combo[0];
+            input2.oninput = update;
             td.appendChild(input2);
             tr.appendChild(td);
             // 2人目 名前
@@ -228,7 +222,6 @@ player6
             tr.appendChild(td);
 
             tr.appendChild(td);
-
             tbl.appendChild(tr);
         }
     }
@@ -309,7 +302,6 @@ player6
                     after = evaluate(order);
                     order[j2] = order[i2];
                     order[i2] = tmp;
-                    //console.log(before - after);
                     if (zantei < before - after) {
                         zantei = before - after;
                         i3 = i;
@@ -347,6 +339,54 @@ player6
         //console.log('最大連戦数：' + max);
         //console.log('総合連戦数：' + total);
         return total;
+    }
+
+    function update() {
+
+        let text;
+        text = document.getElementById("text").value.trimStart();
+        text = document.getElementById("text").value.trimEnd();
+        let member = text.split(/\n/);
+        let n = member.length;    // 人数
+        let cell;
+        let points;
+        let sum;
+
+        for (let i = 0; i < n; i++) {
+            sum = 0;
+            for (let j = 0; j < n; j++) {
+                if (i != j) {
+                    cell = document.getElementById(i + '_' + j);
+                    points = document.getElementById('in' + i + '_' + j);
+                    if (points.value != '') {
+                        //console.log(i + '_' + j + ':' + points.value);
+                        cell.innerHTML = points.value;
+                        sum += Number(points.value);
+                    } else {
+                        cell.innerHTML = "";
+                    }
+                }
+            }
+            document.getElementById('sum' + i).innerHTML = sum;
+        }
+    }
+
+    function reset() {
+        let text;
+        text = document.getElementById("text").value.trimStart();
+        text = document.getElementById("text").value.trimEnd();
+        let member = text.split(/\n/);
+        let n = member.length;    // 人数
+
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                if (i != j) {
+                    document.getElementById('in' + i + '_' + j).value = '';
+                }
+            }
+            document.getElementById('sum' + i).innerHTML = 0;
+        }
+        update();
     }
 
     function deleteForm() {
