@@ -36,6 +36,7 @@ player6
 </body>
 
 </html>
+
 <script>
     check();
 
@@ -83,7 +84,7 @@ player6
         }
 
         let order = [];   // 対戦順 list.num の和で組み合わせを表現
-        for (let i = 0; i < len / 2 + 3; i++) {
+        for (let i = 0; i < len; i++) {
             for (let j = 0; j < i; j++) {
                 order.push(list[i].num + list[j].num);
 
@@ -92,7 +93,7 @@ player6
 
         shuffle(order);
 
-        for(let cnt=0;cnt<len;cnt++) {
+        for(let cnt=0;cnt<10;cnt++) {
             cnt1 = best_two_opt(order);
             cnt2 = best_exchange(order);
         }
