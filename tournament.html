@@ -73,6 +73,7 @@
             player2_score.classList += ' number';
             player1.classList += ' name';
             player2.classList += ' name';
+
             // round1 の時シードがあったら表記に変更
             if (battle[i].player1_id == undefined && battle[i].round == 1) {
                 player2.remove();
@@ -110,6 +111,21 @@
                 player2.setAttribute('onclick', `winner(${i},${battle[i].player2_id})`);
             }
         }
+
+        // 罫線描画
+        /*
+        let space = 0, cnt = 0;
+        for (let i = 0; i < round; i++) {
+            let x = 0;
+            let y = 2 ** i;
+            let top = document.getElementById('round' + (i + 1) + (y + space) + '_' + x);
+            let rCnt = 2 ** (i + 1);
+            let bottom = document.getElementById('round' + (i + 1) + (y + space + rCnt) + '_' + x)
+            if (cnt == 0) {
+                // 初回
+
+            }
+        }*/
     }
 
     // battle配列,tableの初期設定
@@ -232,7 +248,7 @@
                     td.id = `round${Math.trunc(j / 3) + 1}_${i}_${0}`;
                     tr.appendChild(td);
                     td = document.createElement('td');
-                    //td.classList = ('line');
+                    td.classList = ('line');
                     //td.classList = ('border_left');
                     td.id = `round${Math.trunc(j / 3) + 1}_${i}_${1}`;
                     tr.appendChild(td);
@@ -258,6 +274,15 @@
             }
         }
         list = memberList;
+
+        if (document.getElementById("check").checked == false) {
+            for (let i = 0; i < list.length; i++) {
+                let rnd = getRandom(0, list.length - 1);
+                let tmp = list[i];
+                list[i] = list[rnd];
+                list[rnd] = tmp;
+            }
+        }
 
         let tournamentSize = 1, tmp;
         let flg = 0;
@@ -329,7 +354,7 @@
                 let player1 = document.getElementById(y + '_' + (x + 1));
                 if (battle[i] == undefined || !isNaN(battle[i].player1_id)) {
                     player1.innerHTML = list[battle[i].player1_id];
-                player1.setAttribute('onclick', `winner(${i},${battle[i].player1_id})`);
+                    player1.setAttribute('onclick', `winner(${i},${battle[i].player1_id})`);
                 }
                 player1.classList = 'winner';
             } else {
