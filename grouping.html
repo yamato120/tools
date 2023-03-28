@@ -25,6 +25,18 @@
         <option value="6">6</option>
         <option value="7">7</option>
         <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
     </select>
     <input type="button" id="done" value="実行" onclick="grouping()">
     <input type="button" id="delete" value="クリア" onclick="deleteForm()">
@@ -67,7 +79,7 @@
         if (len % num != 0) {
             // alert("チーム数で割り切れる人数を入力してください。");
             alert("人数不揃いのチームがあります。");
-            return 0;
+            //return 0;
         }
         //シャッフル
         for (var i = 0; i < len; i++) {
