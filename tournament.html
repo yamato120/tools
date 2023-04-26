@@ -13,22 +13,34 @@
 <body>
     <h2>トーナメント作成ツール</h2>
     <h3>(i)選手登録</h3>
-    <input type="checkbox" id="check" checked>シード順位を考慮する<br>
+    <input type="checkbox" id="check" checked>シード順位を考慮する(チェック外すとランダム)<br>
     <input type="button" id="add" value="追加" onclick="add()">
     <input type="button" id="delete" value="削除" onclick="del()">
-    現在:<span id="num">2</span>名<br>
+    現在:<span id="num">4</span>名<br>
     <table id="member">
         <tr>
             <td id="seed0">1</td>
             <td><input type="button" value="↑" onclick="up(0)"></td>
             <td><input type="button" value="↓" onclick="down(0)"></td>
-            <td><input type="text" id="member0"></td>
+            <td><input type="text" id="member0" onfocus = "this.select();" value="player1"></td>
         </tr>
         <tr>
             <td id="seed1">2</td>
             <td><input type="button" value="↑" onclick="up(1)"></td>
             <td><input type="button" value="↓" onclick="down(1)"></td>
-            <td><input type="text" id="member1"></td>
+            <td><input type="text" id="member1"onfocus = "this.select();"  value="player2"></td>
+        </tr>
+        <tr>
+            <td id="seed2">3</td>
+            <td><input type="button" value="↑" onclick="up(1)"></td>
+            <td><input type="button" value="↓" onclick="down(1)"></td>
+            <td><input type="text" id="member2"onfocus = "this.select();"  value="player3"></td>
+        </tr>
+        <tr>
+            <td id="seed3">4</td>
+            <td><input type="button" value="↑" onclick="up(1)"></td>
+            <td><input type="button" value="↓" onclick="down(1)"></td>
+            <td><input type="text" id="member3"onfocus = "this.select();"  value="player4"></td>
         </tr>
     </table>
     <input type="button" id="done" value="実行" onclick="tournament()">
@@ -44,7 +56,7 @@
 
 
 <script>
-    var num = 2;
+    var num = 4;
     var list;
     var tournament_list;    // 対戦順
     var round;  //
@@ -111,21 +123,75 @@
                 player2.setAttribute('onclick', `winner(${i},${battle[i].player2_id})`);
             }
         }
+    }
 
-        // 罫線描画
-        /*
-        let space = 0, cnt = 0;
-        for (let i = 0; i < round; i++) {
-            let x = 0;
-            let y = 2 ** i;
-            let top = document.getElementById('round' + (i + 1) + (y + space) + '_' + x);
-            let rCnt = 2 ** (i + 1);
-            let bottom = document.getElementById('round' + (i + 1) + (y + space + rCnt) + '_' + x)
-            if (cnt == 0) {
-                // 初回
-
+    // 罫線描画
+    function draw_line() {
+        for (let i = 0; i < battle.length; i++) {
+            //console.log(battle[i].x + "," + battle[i].y + "," + battle[i].round);
+            // round2以降battleから左にに1つ線を伸ばす
+            let b;
+            if (battle[i].round > 1) {
+                b = document.getElementById(battle[i].y + "_" + (battle[i].x - 1));
+                b.classList += ' border_bottom ';
             }
-        }*/
+
+            // 最終戦だった場合終了
+            if (i == battle.length - 1) return;
+
+            // battleから右に1つ線を伸ばす
+            b = document.getElementById(battle[i].y + "_" + (battle[i].x + 3));
+            b.classList += ' border_bottom ';
+            let space = 2 ** (battle[i].round - 1);
+
+            let x = (battle[i].x + 4);
+            let y = battle[i].y;
+            if (i % 2 == 0) {
+                y++;
+                for (let i = 0; i < space; i++) {
+                    console.log(y + i);
+                    b = document.getElementById((y + i) + "_" + x);
+                    b.classList += ' border_left ';
+                }
+            } else {
+                for (let i = 0; i < space; i++) {
+                    b = document.getElementById((y - i) + "_" + x);
+                    b.classList += ' border_left';
+                }
+            }
+
+            b = document.getElementById(y + "_" + x);
+            b.classList = 'border_left';
+        }
+    }
+
+    function set_textbox() {
+        let x, y;
+        for (let i = 0; i < battle.length; i++) {
+            x = battle[i].x + 2;
+            y = battle[i].y;
+
+            if (battle[i].player1_id != undefined) {
+                let input1 = document.createElement("input");
+                let cell1 = document.getElementById(y + "_" + x);
+                input1.setAttribute("type", "text");
+                input1.setAttribute("maxlength", "5");
+                input1.setAttribute("size", "1");
+                input1.setAttribute("value", "");
+                cell1.appendChild(input1);
+
+                let input2 = document.createElement("input");
+                let cell2 = document.getElementById((y + 1) + "_" + x);
+                input2.setAttribute("type", "text");
+                input2.setAttribute("maxlength", "5");
+                input2.setAttribute("size", "1");
+                input2.setAttribute("value", "");
+                cell2.appendChild(input2);
+            } else {
+                let cell = document.getElementById(y + "_" + x);
+                cell.innerHTML = "seed";
+            }
+        }
     }
 
     // battle配列,tableの初期設定
@@ -175,7 +241,7 @@
             if (i < battle.length - 1 && battle[i + 1].round != r) {
                 y = 0;
                 r++;
-                x += 3;
+                x += 5;
                 space++;
                 cnt = 0;
             }
@@ -236,12 +302,13 @@
         // 描画領域生成
         for (let i = 0; i < tournamentSize; i++) {
             let tr = document.createElement('tr');
-            for (let j = 0; j < round * 3; j++) {
+            for (let j = 0; j < round * 5 - 2; j++) {
                 let td = document.createElement('td');
                 td.id = i + '_' + j;
                 td.classList = 'cell';
                 //td.innerHTML = i + '_' + j;
                 tr.appendChild(td);
+                /*
                 if ((j + 1) % 3 == 0 && j != 0 && j < round * 3 - 1) {
                     td = document.createElement('td');
                     td.classList = ('line');
@@ -252,7 +319,7 @@
                     //td.classList = ('border_left');
                     td.id = `round${Math.trunc(j / 3) + 1}_${i}_${1}`;
                     tr.appendChild(td);
-                }
+                }*/
             }
 
             tbl.appendChild(tr);
@@ -338,6 +405,8 @@
         create_table();
         battle_init();
         table_init();
+        draw_line();
+        set_textbox();
     }
 
     function update() {
@@ -418,7 +487,7 @@
                 player1.classList = 'name';
                 player2.classList = 'name';
             }
-            alert(`${list[battle[battle.length - 1].winner]}さんが優勝です！`);
+            //alert(`${list[battle[battle.length - 1].winner]}さんが優勝です！`);
             update();
             return;
         }
@@ -467,11 +536,14 @@
             addElement = document.createElement('input');
             addElement.type = 'text';
             addElement.id = 'member' + num;
-            addElement.value = '';
+            addElement.value = 'player' + (num + 1);
             td.appendChild(addElement);
             tr.appendChild(td);
 
+
             table.appendChild(tr);
+            let text = document.getElementById('member' + num);
+            text.setAttribute('onfocus', "this.select();");
 
             num++;
             document.getElementById("num").innerHTML = num;
