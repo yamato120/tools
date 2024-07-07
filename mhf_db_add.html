@@ -25,13 +25,13 @@
         <option value="5" selected>その他のアイテム</option>
     </select>
     <br>
-    item_hashの最後の値
+    idの最後の値
     <input type="text" id="itemhash" style="width:60px;" placeholder="半角数字">
     値段
     <input type="text" id="points" style="width:60px;" value="1" placeholder="半角数字">
     数量
     <input type="text" id="tradequantity" style="width:60px;" value="999" placeholder="半角数字"><br>
-    item_id入力<br>
+    item_id入力(Dec)<br>
     <textarea rows="10" id="itemid" placeholder="半角数字改行して入力" style="width:60px;"></textarea>
     <input type="button" id="done" value="SQL生成" onclick="done()">
     <input type="button" id="delete" value="クリア" onclick="deleteForm()">
@@ -49,7 +49,7 @@
         var itemhash = document.getElementById("itemhash").value;
         var points = document.getElementById("points").value;
         var tradequantity = document.getElementById("tradequantity").value;
-        var INSERT = 'INSERT INTO "public"."normal_shop_items" <br> ("shoptype", "shopid", "itemhash", "itemid", "points", "tradequantity", "rankreqlow", "rankreqhigh", "rankreqg", "storelevelreq", "maximumquantity", "boughtquantity", "roadfloorsrequired", "weeklyfataliskills")<br> VALUES <br>';
+        var INSERT = 'INSERT INTO "public"."shop_items" VALUES <br>';
         var text = document.getElementById("itemid").value.trimEnd();
         var itemid = text.split(/\n/);
         var len = itemid.length;
@@ -61,7 +61,7 @@
         }
         disp.innerHTML = INSERT;
         for (var i = 0; i < len; i++) {
-            disp.innerHTML += `(${shoptype}, ${shopid}, ${parseInt(itemhash) + parseInt(i) + 1}, ${itemid[i]}, ${points}, ${tradequantity}, 0, 0, 0, 0, 0, 0, 0, 0)`;
+            disp.innerHTML += `(${shoptype}, ${shopid}, ${parseInt(itemhash) + parseInt(i) + 1}, ${itemid[i]}, ${points}, ${tradequantity}, 0, 0, 0, 0, 0, 0, 0)`;
             if (i + 1 != len) {
                 disp.innerHTML += ',<br>';
             }
