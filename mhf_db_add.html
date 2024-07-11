@@ -36,6 +36,7 @@
     <input type="button" id="done" value="SQL生成" onclick="done()">
     <input type="button" id="delete" value="クリア" onclick="deleteForm()">
     <br>
+    <button onclick="copyButton('copytxt')">SQLコピー</button>
     <div id="disp">
     </div>
 </body>
@@ -71,5 +72,13 @@
 
     function deleteForm() {
         location.reload();
+    }
+
+    function copyButton(elementId) {
+        // 指定したIDの要素のテキストを取得
+        var element = document.getElementById(elementId);
+
+        // テキストをクリップボードにコピー
+        navigator.clipboard.writeText(element.textContent);
     }
 </script>
